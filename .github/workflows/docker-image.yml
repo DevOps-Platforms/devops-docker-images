@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+env:
+  DEVOPS_IMAGE_NAME: "devops-runner-image"
+  DEVOPS_IMAGE_VERSION: 0.0.2
+  ACR_NAME: "devopsplatformimages"
+
+jobs:
+
+  build:
+    runs-on: [ self-hosted ]
+    container: devopsplatformimages.azurecr.io/devops-runner-image:0.0.1
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . -t $DEVOPS_IMAGE_NAME --file Dockerfile 
+    - name: Azure Container Registry Login
+      run: |
+        az login --service-principal --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+        az acr login --name $ACR_NAME
+    - name: Push the new Image to ACR
+      run: az acr build --image $DEVOPS_IMAGE_NAME:$DEVOPS_IMAGE_VERSION --registry $ACR_NAME .
