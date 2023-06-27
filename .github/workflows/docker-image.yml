@@ -17,14 +17,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Install Azure CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    - name: Build the Docker image
-      run: docker build . -t $DEVOPS_IMAGE_NAME --file Dockerfile 
+   # - name: Install Azure CLI
+    #  run: |
+     #   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    #- name: Build the Docker image
+     # run: docker build . -t $DEVOPS_IMAGE_NAME --file Dockerfile 
     - name: Azure Container Registry Login
       run: |
         az login --service-principal --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
         az acr login --name $ACR_NAME
     - name: Push the new Image to ACR
-      run: az acr build --image $DEVOPS_IMAGE_NAME:$DEVOPS_IMAGE_VERSION --registry $ACR_NAME .
+      run: az acr build --image $DEVOPS_IMAGE_NAME:$DEVOPS_IMAGE_VERSION --file Dockerfile --registry $ACR_NAME .
