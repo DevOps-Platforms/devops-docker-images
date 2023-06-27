@@ -14,10 +14,12 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    container: devopsplatformimages.azurecr.io/devops-runner-image:0.0.1
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install Azure CLI
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
     - name: Build the Docker image
       run: docker build . -t $DEVOPS_IMAGE_NAME --file Dockerfile 
     - name: Azure Container Registry Login
